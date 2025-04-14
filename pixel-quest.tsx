@@ -435,52 +435,24 @@ export default function RetroPixelQuest() {
   };
 
   const resetGame = () => {
-    const firstPos = generateRandomPosition();
+    // Create a fresh copy of the default game state with new random positions
+    const newItems = defaultGameState.items.map((itemTemplate, index) => {
+      const { x, y } = generateRandomPosition();
+      return {
+        ...itemTemplate,
+        x,
+        y,
+        collected: false,
+      };
+    });
+
+    // Reset to the initial state
     setGameState({
-      ...defaultGameState,
-      items: [
-        {
-          id: "helmet",
-          x: firstPos.x,
-          y: firstPos.y,
-          width: 50,
-          height: 50,
-          collected: false,
-        },
-        {
-          id: "chestplate",
-          x: 0,
-          y: 0,
-          width: 50,
-          height: 50,
-          collected: false,
-        },
-        {
-          id: "boots",
-          x: 0,
-          y: 0,
-          width: 50,
-          height: 50,
-          collected: false,
-        },
-        {
-          id: "shield",
-          x: 0,
-          y: 0,
-          width: 50,
-          height: 50,
-          collected: false,
-        },
-        {
-          id: "sword",
-          x: 0,
-          y: 0,
-          width: 50,
-          height: 50,
-          collected: false,
-        },
-      ],
+      player: { ...defaultGameState.player }, // Reset player position
+      currentItemIndex: 0, // Reset to the first item
+      items: newItems,
       keys: {
+        // Explicitly reset all key states
         up: false,
         down: false,
         left: false,
