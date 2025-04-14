@@ -3,6 +3,7 @@
 import { Volume2, VolumeX } from "lucide-react";
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { useResponsiveCanvas } from "./hooks/use-responsive-canvas";
 
 const generateRandomPosition = () => {
   return {
@@ -12,6 +13,10 @@ const generateRandomPosition = () => {
 };
 
 const firstItemPos = generateRandomPosition();
+
+// Game constants
+const BASE_WIDTH = 1200;
+const BASE_HEIGHT = 1200;
 
 const defaultGameState = {
   player: { x: 100, y: 100, width: 80, height: 80, speed: 3 },
@@ -73,12 +78,20 @@ const defaultGameState = {
 
 export default function RetroPixelQuest() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [gameState, setGameState] = useState(defaultGameState);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showInstructions, setShowInstructions] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
   const pickupAudioRef = useRef<HTMLAudioElement>(null);
   const victoryAudioRef = useRef<HTMLAudioElement>(null);
+
+  // Import the custom hook for responsive canvas
+  const { width, height, scale } = useResponsiveCanvas(
+    containerRef,
+    BASE_WIDTH,
+    BASE_HEIGHT
+  );
 
   useEffect(() => {
     const playerImg = new Image();
@@ -91,24 +104,37 @@ export default function RetroPixelQuest() {
     });
 
     const mapImg = new Image();
-    mapImg.src = "/map.png";
+    mapImg.src = "/map_dungeon.png";
 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // Set canvas dimensions based on the calculated responsive size
+    canvas.width = width;
+    canvas.height = height;
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // Apply scaling to maintain consistent rendering
+    ctx.save();
+    ctx.scale(scale, scale);
 
     let animationFrameId: number;
 
     const render = () => {
       if (!canvas) return;
 
+      // Clear the canvas and reset transformations
+      ctx.resetTransform();
       ctx.fillStyle = "#0f0a1e";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Apply scaling for consistent rendering across screen sizes
+      ctx.scale(scale, scale);
+
       if (mapImg.complete) {
-        ctx.drawImage(mapImg, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(mapImg, 0, 0, BASE_WIDTH, BASE_HEIGHT);
       }
 
       const currentItem = gameState.items[gameState.currentItemIndex];
@@ -163,7 +189,11 @@ export default function RetroPixelQuest() {
         );
       }
 
-      applyCRTEffect(ctx, canvas.width, canvas.height);
+      // Apply CRT effect after all game elements are drawn
+      applyCRTEffect(ctx, BASE_WIDTH, BASE_HEIGHT);
+
+      // Reset transformation for next frame
+      ctx.resetTransform();
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -173,7 +203,7 @@ export default function RetroPixelQuest() {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [gameState]);
+  }, [gameState, width, height, scale]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -245,23 +275,25 @@ export default function RetroPixelQuest() {
         let newX = prev.player.x;
         let newY = prev.player.y;
 
+        const adjustedSpeed = prev.player.speed * (scale || 1);
+
         if ((prev.keys.up || prev.keys.w) && newY > 0) {
-          newY -= prev.player.speed;
+          newY -= adjustedSpeed;
         }
         if (
           (prev.keys.down || prev.keys.s) &&
-          newY < 1000 - prev.player.height
+          newY < BASE_HEIGHT - prev.player.height
         ) {
-          newY += prev.player.speed;
+          newY += adjustedSpeed;
         }
         if ((prev.keys.left || prev.keys.a) && newX > 0) {
-          newX -= prev.player.speed;
+          newX -= adjustedSpeed;
         }
         if (
           (prev.keys.right || prev.keys.d) &&
-          newX < 1500 - prev.player.width
+          newX < BASE_WIDTH - prev.player.width
         ) {
-          newX += prev.player.speed;
+          newX += adjustedSpeed;
         }
 
         const updatedItems = [...prev.items];
@@ -436,8 +468,10 @@ export default function RetroPixelQuest() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black select-none">
-      <div className="fixed left-0 top-0 w-full h-full opacity-20 z-0">
-        <NextImage src={"/game/rock.png"} alt="rock" fill={true} />
+      <div className="pointer-events-none fixed inset-0 z-[99] crt-overlay"></div>
+
+      <div className="fixed left-0 top-0 w-full h-full opacity-30 z-0">
+        <NextImage src={"/map_dungeon.png"} alt="rock" fill={true} />
       </div>
       <NextImage
         src={"/dungeon_quest_2.png"}
@@ -446,12 +480,13 @@ export default function RetroPixelQuest() {
         height={300}
       />
       <div className="flex flex-col md:flex-row gap-4 w-full p-4">
-        <div className="relative border-4 border-orange-950  overflow-hidden">
+        <div
+          ref={containerRef}
+          className="relative overflow-hidden flex-1 h-[60vh] md:h-[65vh]"
+        >
           <canvas
             ref={canvasRef}
-            width={1500}
-            height={1000}
-            className="pixelated"
+            className="pixelated max-w-full h-auto mx-auto block"
             onClick={() => setShowInstructions(false)}
           />
 
@@ -466,7 +501,7 @@ export default function RetroPixelQuest() {
           {/* Instructions Overlay */}
           {showInstructions && (
             <div
-              className="absolute z-[2] inset-0 bg-black flex flex-col items-center justify-center p-4 cursor-pointer"
+              className="absolute z-[2] inset-0 bg-black/85 flex flex-col items-center justify-center p-4 cursor-pointer"
               onClick={() => setShowInstructions(false)}
             >
               <div className="bg-black border-4 border-orange-700  max-w-md flex items-center flex-col">
@@ -567,6 +602,30 @@ export default function RetroPixelQuest() {
             ))}
           </div>
         </div>
+      </div>
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-5 mt-2 md:mt-4 px-2  w-full">
+        <NextImage
+          src={"/ui/joystick.png"}
+          className="object-contain z-[1] relative"
+          alt="game name"
+          width={150}
+          height={150}
+        />
+
+        <NextImage
+          src={"/ui/controls.png"}
+          alt="game name"
+          className="object-contain z-[1] relative"
+          width={150}
+          height={150}
+        />
+        <NextImage
+          src={"/ui/wasd.png"}
+          alt="game name"
+          className="object-contain z-[1] relative"
+          width={150}
+          height={150}
+        />
       </div>
 
       {/* Audio Elements */}
