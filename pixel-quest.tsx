@@ -6,14 +6,12 @@ import { useEffect, useRef, useState } from "react";
 import { useResponsiveCanvas } from "./hooks/use-responsive-canvas";
 import { Toaster } from "./components/ui/toaster";
 import { useToast } from "./hooks/use-toast";
-// Game constants
+
 const BASE_WIDTH = 1200;
 const BASE_HEIGHT = 1200;
 
 const generateRandomPosition = () => {
-  // Use the correct BASE_WIDTH and BASE_HEIGHT values
-  // Add buffer from edges and account for item size (50x50)
-  const buffer = 100; // Buffer from edges
+  const buffer = 100;
   return {
     x: Math.floor(Math.random() * (BASE_WIDTH - 50 - buffer)) + buffer / 2,
     y: Math.floor(Math.random() * (BASE_HEIGHT - 50 - buffer)) + buffer / 2,
@@ -82,7 +80,6 @@ export default function RetroPixelQuest() {
   const victoryAudioRef = useRef<HTMLAudioElement>(null);
   const { toast } = useToast();
 
-  // Import the custom hook for responsive canvas
   const { width, height, scale } = useResponsiveCanvas(
     containerRef,
     BASE_WIDTH,
@@ -105,14 +102,12 @@ export default function RetroPixelQuest() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Set canvas dimensions based on the calculated responsive size
     canvas.width = width;
     canvas.height = height;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Apply scaling to maintain consistent rendering
     ctx.save();
     ctx.scale(scale, scale);
 
@@ -121,12 +116,10 @@ export default function RetroPixelQuest() {
     const render = () => {
       if (!canvas) return;
 
-      // Clear the canvas and reset transformations
       ctx.resetTransform();
       ctx.fillStyle = "#0f0a1e";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Apply scaling for consistent rendering across screen sizes
       ctx.scale(scale, scale);
 
       if (mapImg.complete) {
@@ -185,10 +178,8 @@ export default function RetroPixelQuest() {
         );
       }
 
-      // Apply CRT effect after all game elements are drawn
       applyCRTEffect(ctx, BASE_WIDTH, BASE_HEIGHT);
 
-      // Reset transformation for next frame
       ctx.resetTransform();
 
       animationFrameId = requestAnimationFrame(render);
@@ -267,7 +258,7 @@ export default function RetroPixelQuest() {
 
   useEffect(() => {
     const updateGame = () => {
-      if (isPaused) return; // Skip game update when paused
+      if (isPaused) return;
 
       setGameState((prev) => {
         let newX = prev.player.x;
@@ -307,12 +298,10 @@ export default function RetroPixelQuest() {
           ) {
             currentItem.collected = true;
             itemCollected = true;
-            // We'll handle positioning in the random selection block below instead
           }
         }
 
         if (itemCollected) {
-          // Show toast notification
           toast({
             title: "Item Collected!",
             description: `You found: ${currentItem.id.replace("_", " ")}`,
@@ -325,19 +314,16 @@ export default function RetroPixelQuest() {
             pickupAudioRef.current.play();
           }
 
-          // Find uncollected items
           const uncollectedItems = updatedItems
             .map((item, index) => ({ item, index }))
             .filter(({ item }) => !item.collected);
 
-          // Randomly select next item if there are any uncollected
           if (uncollectedItems.length > 0) {
             const randomIndex = Math.floor(
               Math.random() * uncollectedItems.length
             );
             prev.currentItemIndex = uncollectedItems[randomIndex].index;
 
-            // Set a new random position for the newly selected item
             const newPos = generateRandomPosition();
             updatedItems[prev.currentItemIndex].x = newPos.x;
             updatedItems[prev.currentItemIndex].y = newPos.y;
@@ -429,13 +415,11 @@ export default function RetroPixelQuest() {
   };
 
   const quitGame = () => {
-    // Reset game and show instructions
     resetGame();
     setShowInstructions(true);
   };
 
   const resetGame = () => {
-    // Create a fresh copy of the default game state with new random positions
     const newItems = defaultGameState.items.map((itemTemplate, index) => {
       const { x, y } = generateRandomPosition();
       return {
@@ -446,13 +430,11 @@ export default function RetroPixelQuest() {
       };
     });
 
-    // Reset to the initial state
     setGameState({
-      player: { ...defaultGameState.player }, // Reset player position
-      currentItemIndex: 0, // Reset to the first item
+      player: { ...defaultGameState.player },
+      currentItemIndex: 0,
       items: newItems,
       keys: {
-        // Explicitly reset all key states
         up: false,
         down: false,
         left: false,

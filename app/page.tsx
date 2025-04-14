@@ -1,9 +1,9 @@
-import RetroPixelQuest from "@/pixel-quest"
+import RetroPixelQuest from "@/components/game/RetroPixelQuest";
 
 export default function Home() {
   return (
     <main>
       <RetroPixelQuest />
     </main>
-  )
+  );
 }
