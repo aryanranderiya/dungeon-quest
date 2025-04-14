@@ -21,40 +21,40 @@ const defaultGameState = {
       id: "helmet",
       x: firstItemPos.x,
       y: firstItemPos.y,
-      width: 40,
-      height: 40,
+      width: 50,
+      height: 50,
       collected: false,
     },
     {
       id: "chestplate",
       x: 0,
       y: 0,
-      width: 40,
-      height: 40,
+      width: 50,
+      height: 50,
       collected: false,
     },
     {
       id: "boots",
       x: 0,
       y: 0,
-      width: 40,
-      height: 40,
+      width: 50,
+      height: 50,
       collected: false,
     },
     {
       id: "shield",
       x: 0,
       y: 0,
-      width: 40,
-      height: 40,
+      width: 50,
+      height: 50,
       collected: false,
     },
     {
       id: "sword",
       x: 0,
       y: 0,
-      width: 40,
-      height: 40,
+      width: 50,
+      height: 50,
       collected: false,
     },
   ],
@@ -383,40 +383,40 @@ export default function RetroPixelQuest() {
           id: "helmet",
           x: firstPos.x,
           y: firstPos.y,
-          width: 40,
-          height: 40,
+          width: 50,
+          height: 50,
           collected: false,
         },
         {
           id: "chestplate",
           x: 0,
           y: 0,
-          width: 40,
-          height: 40,
+          width: 50,
+          height: 50,
           collected: false,
         },
         {
           id: "boots",
           x: 0,
           y: 0,
-          width: 40,
-          height: 40,
+          width: 50,
+          height: 50,
           collected: false,
         },
         {
           id: "shield",
           x: 0,
           y: 0,
-          width: 40,
-          height: 40,
+          width: 50,
+          height: 50,
           collected: false,
         },
         {
           id: "sword",
           x: 0,
           y: 0,
-          width: 40,
-          height: 40,
+          width: 50,
+          height: 50,
           collected: false,
         },
       ],
@@ -436,6 +436,9 @@ export default function RetroPixelQuest() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black select-none">
+      <div className="fixed left-0 top-0 w-full h-full opacity-20 z-0">
+        <NextImage src={"/game/rock.png"} alt="rock" fill={true} />
+      </div>
       <NextImage
         src={"/dungeon_quest_2.png"}
         alt="game name"
@@ -463,7 +466,7 @@ export default function RetroPixelQuest() {
           {/* Instructions Overlay */}
           {showInstructions && (
             <div
-              className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 cursor-pointer"
+              className="absolute z-[2] inset-0 bg-black flex flex-col items-center justify-center p-4 cursor-pointer"
               onClick={() => setShowInstructions(false)}
             >
               <div className="bg-black border-4 border-orange-700  max-w-md flex items-center flex-col">
@@ -527,7 +530,7 @@ export default function RetroPixelQuest() {
           )}
         </div>
 
-        <div className="bg-[#0f0a1e] border-4 border-orange-950 p-4  h-fit w-[230px]">
+        <div className="bg-[#0f0a1e] border-4 border-orange-950 p-4 h-fit w-[230px] relative z-[1]">
           <NextImage
             src={"/ui/inventory.png"}
             alt="game name"
