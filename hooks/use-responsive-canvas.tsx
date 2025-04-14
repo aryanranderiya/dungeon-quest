@@ -14,7 +14,7 @@ interface CanvasDimensions {
  * @param padding Optional padding to apply (default: 0)
  */
 export function useResponsiveCanvas(
-  containerRef: RefObject<HTMLDivElement>,
+  containerRef: RefObject<HTMLDivElement | null>,
   baseWidth: number,
   baseHeight: number,
   padding: number = 0

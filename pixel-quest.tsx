@@ -4,6 +4,8 @@ import { Volume2, VolumeX, Pause, Play, X, Info } from "lucide-react";
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useResponsiveCanvas } from "./hooks/use-responsive-canvas";
+import { Toaster } from "./components/ui/toaster";
+import { useToast } from "./hooks/use-toast";
 // Game constants
 const BASE_WIDTH = 1200;
 const BASE_HEIGHT = 1200;
@@ -78,6 +80,7 @@ export default function RetroPixelQuest() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const pickupAudioRef = useRef<HTMLAudioElement>(null);
   const victoryAudioRef = useRef<HTMLAudioElement>(null);
+  const { toast } = useToast();
 
   // Import the custom hook for responsive canvas
   const { width, height, scale } = useResponsiveCanvas(
@@ -308,9 +311,19 @@ export default function RetroPixelQuest() {
           }
         }
 
-        if (itemCollected && soundEnabled && pickupAudioRef.current) {
-          pickupAudioRef.current.currentTime = 0;
-          pickupAudioRef.current.play();
+        if (itemCollected) {
+          // Show toast notification
+          toast({
+            title: "Item Collected!",
+            description: `You found: ${currentItem.id.replace("_", " ")}`,
+            variant: "default",
+            duration: 3000,
+          });
+
+          if (soundEnabled && pickupAudioRef.current) {
+            pickupAudioRef.current.currentTime = 0;
+            pickupAudioRef.current.play();
+          }
 
           // Find uncollected items
           const uncollectedItems = updatedItems
@@ -485,11 +498,11 @@ export default function RetroPixelQuest() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-black select-none">
       <div className="pointer-events-none fixed inset-0 z-[99] crt-overlay" />
 
-      <div className="fixed left-0 top-0 w-full h-full opacity-30 z-0">
+      <div className="fixed left-0 top-0 w-full h-full opacity-60 z-0">
         <NextImage src={"/map_dungeon.png"} alt="rock" fill={true} />
       </div>
       <NextImage
-        src={"/dungeon_quest.png"}
+        src={"/dungeon_quest_2.png"}
         alt="game name"
         width={300}
         height={300}
@@ -506,8 +519,7 @@ export default function RetroPixelQuest() {
             onClick={() => setShowInstructions(false)}
           />
 
-          {/* Game Controls */}
-          <div className="absolute top-2 left-2 flex gap-2 flex-col w-full">
+          <div className="absolute top-2 left-2 flex gap-2 flex-col w-fit bg-[#110805] p-6">
             <NextImage
               src={"/ui/volume.png"}
               alt="game name"
@@ -546,7 +558,6 @@ export default function RetroPixelQuest() {
               className="z-[1] relative object-contain cursor-pointer hover:scale-110"
             />
           </div>
-
           {/* Instructions Overlay */}
           {showInstructions && (
             <div
@@ -649,7 +660,7 @@ export default function RetroPixelQuest() {
                   src={"/ui/play.png"}
                   alt="game name"
                   width={100}
-                  className="hover:scale-110 cursor-pointer"
+                  className="hover:scale-110 cursor-pointer m-6"
                   height={100}
                   onClick={resetGame}
                 />
@@ -707,11 +718,11 @@ export default function RetroPixelQuest() {
           )}
         </div>
 
-        <div className="bg-[#0f0a1e] border-4 border-orange-950 p-4 h-fit w-[260px] relative z-[1]">
+        <div className="bg-[#110805] p-4 h-fit w-[300px] relative z-[1] flex flex-col items-center">
           <NextImage
             src={"/ui/inventory.png"}
             alt="game name"
-            width={300}
+            width={200}
             className="mb-5"
             height={200}
           />
@@ -778,6 +789,9 @@ export default function RetroPixelQuest() {
       <audio ref={audioRef} src="/bgm.mp3" loop />
       <audio ref={pickupAudioRef} src="/pickup.mp3" />
       <audio ref={victoryAudioRef} src="/victory.mp3" />
+
+      {/* Toast notification container */}
+      <Toaster />
 
       <style jsx global>{`
         .pixelated {
