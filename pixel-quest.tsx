@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from "react";
 
 const generateRandomPosition = () => {
   return {
-    x: Math.floor(Math.random() * (640 - 40)), // canvas width - item width
-    y: Math.floor(Math.random() * (480 - 40)), // canvas height - item height
+    x: Math.floor(Math.random() * (1500 - 40)), // canvas width - item width
+    y: Math.floor(Math.random() * (1000 - 40)), // canvas height - item height
   };
 };
 
@@ -82,12 +82,12 @@ export default function RetroPixelQuest() {
 
   useEffect(() => {
     const playerImg = new Image();
-    playerImg.src = "/player.png";
+    playerImg.src = "/player/player.png";
 
     const itemImages: Record<string, HTMLImageElement> = {};
     gameState.items.forEach((item) => {
       itemImages[item.id] = new Image();
-      itemImages[item.id].src = `/${item.id}.png`;
+      itemImages[item.id].src = `/player/${item.id}.png`;
     });
 
     const mapImg = new Image();
@@ -250,7 +250,7 @@ export default function RetroPixelQuest() {
         }
         if (
           (prev.keys.down || prev.keys.s) &&
-          newY < 480 - prev.player.height
+          newY < 1000 - prev.player.height
         ) {
           newY += prev.player.speed;
         }
@@ -259,7 +259,7 @@ export default function RetroPixelQuest() {
         }
         if (
           (prev.keys.right || prev.keys.d) &&
-          newX < 640 - prev.player.width
+          newX < 1500 - prev.player.width
         ) {
           newX += prev.player.speed;
         }
@@ -443,7 +443,7 @@ export default function RetroPixelQuest() {
         height={300}
       />
       <div className="flex flex-col md:flex-row gap-4 w-full p-4">
-        <div className="relative border-4 border-orange-950 rounded-sm overflow-hidden">
+        <div className="relative border-4 border-orange-950  overflow-hidden">
           <canvas
             ref={canvasRef}
             width={1500}
@@ -455,7 +455,7 @@ export default function RetroPixelQuest() {
           {/* Sound Toggle */}
           <button
             onClick={toggleSound}
-            className="absolute top-2 left-2 text-white p-1 rounded-sm"
+            className="absolute top-2 left-2 text-white p-1 "
           >
             {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
           </button>
@@ -466,7 +466,7 @@ export default function RetroPixelQuest() {
               className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 cursor-pointer"
               onClick={() => setShowInstructions(false)}
             >
-              <div className="bg-black border-4 border-orange-700 rounded-sm max-w-md flex items-center flex-col">
+              <div className="bg-black border-4 border-orange-700  max-w-md flex items-center flex-col">
                 <NextImage
                   src={"/dungeon_quest.png"}
                   alt="game name"
@@ -497,7 +497,7 @@ export default function RetroPixelQuest() {
           {/* Victory Screen */}
           {gameState.gameComplete && (
             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4">
-              <div className="bg-black border-4 border-orange-700 rounded-sm max-w-md flex items-center flex-col">
+              <div className="bg-black border-4 border-orange-700  max-w-md flex items-center flex-col">
                 <NextImage
                   src={"/dungeon_quest.png"}
                   alt="game name"
@@ -527,7 +527,7 @@ export default function RetroPixelQuest() {
           )}
         </div>
 
-        <div className="bg-[#0f0a1e] border-4 border-orange-800 p-4 rounded-sm h-fit w-[230px]">
+        <div className="bg-[#0f0a1e] border-4 border-orange-950 p-4  h-fit w-[230px]">
           <NextImage
             src={"/ui/inventory.png"}
             alt="game name"
@@ -553,7 +553,7 @@ export default function RetroPixelQuest() {
                   </div>
                   <div className="w-8 h-8 relative">
                     <img
-                      src={`/${item.id}.png`}
+                      src={`/player/${item.id}.png`}
                       alt={item.id}
                       className="w-full h-full object-contain pixelated opacity-60"
                     />
