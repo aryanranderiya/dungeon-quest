@@ -1,6 +1,6 @@
 "use client";
 
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, Pause, Play, X, Info } from "lucide-react";
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useResponsiveCanvas } from "./hooks/use-responsive-canvas";
@@ -17,8 +17,6 @@ const generateRandomPosition = () => {
     y: Math.floor(Math.random() * (BASE_HEIGHT - 50 - buffer)) + buffer / 2,
   };
 };
-
-const firstItemPos = generateRandomPosition();
 
 const defaultGameState = {
   player: { x: 100, y: 100, width: 80, height: 80, speed: 10 },
@@ -75,6 +73,8 @@ export default function RetroPixelQuest() {
   const [gameState, setGameState] = useState(defaultGameState);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showInstructions, setShowInstructions] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const [showCredits, setShowCredits] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const pickupAudioRef = useRef<HTMLAudioElement>(null);
   const victoryAudioRef = useRef<HTMLAudioElement>(null);
@@ -264,6 +264,8 @@ export default function RetroPixelQuest() {
 
   useEffect(() => {
     const updateGame = () => {
+      if (isPaused) return; // Skip game update when paused
+
       setGameState((prev) => {
         let newX = prev.player.x;
         let newY = prev.player.y;
@@ -405,6 +407,20 @@ export default function RetroPixelQuest() {
     setSoundEnabled(!soundEnabled);
   };
 
+  const togglePause = () => {
+    setIsPaused((prev) => !prev);
+  };
+
+  const toggleCredits = () => {
+    setShowCredits((prev) => !prev);
+  };
+
+  const quitGame = () => {
+    // Reset game and show instructions
+    resetGame();
+    setShowInstructions(true);
+  };
+
   const resetGame = () => {
     const firstPos = generateRandomPosition();
     setGameState({
@@ -467,7 +483,7 @@ export default function RetroPixelQuest() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black select-none">
-      <div className="pointer-events-none fixed inset-0 z-[99] crt-overlay"></div>
+      <div className="pointer-events-none fixed inset-0 z-[99] crt-overlay" />
 
       <div className="fixed left-0 top-0 w-full h-full opacity-30 z-0">
         <NextImage src={"/map_dungeon.png"} alt="rock" fill={true} />
@@ -479,10 +495,10 @@ export default function RetroPixelQuest() {
         height={300}
         className="z-[1] relative"
       />
-      <div className="flex flex-col md:flex-row gap-4 w-full p-4">
+      <div className="flex flex-col md:flex-row gap-4 p-4 w-full">
         <div
           ref={containerRef}
-          className="relative overflow-hidden flex-1 h-[60vh] md:h-[65vh]"
+          className="relative overflow-hidden flex-1 w-full h-[60vh] md:h-[65vh]"
         >
           <canvas
             ref={canvasRef}
@@ -490,13 +506,46 @@ export default function RetroPixelQuest() {
             onClick={() => setShowInstructions(false)}
           />
 
-          {/* Sound Toggle */}
-          <button
-            onClick={toggleSound}
-            className="absolute top-2 left-2 text-white p-1 "
-          >
-            {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
-          </button>
+          {/* Game Controls */}
+          <div className="absolute top-2 left-2 flex gap-2 flex-col w-full">
+            <NextImage
+              src={"/ui/volume.png"}
+              alt="game name"
+              width={50}
+              height={50}
+              onClick={toggleSound}
+              className={`z-[1] relative object-contain cursor-pointer hover:scale-110 ${
+                soundEnabled ? "opacity-100" : "opacity-40"
+              }`}
+            />
+
+            <NextImage
+              src={isPaused ? "/ui/play.png" : "/ui/pause.png"}
+              onClick={togglePause}
+              alt="game name"
+              width={100}
+              height={100}
+              className="z-[1] relative min-w-[75px]  object-contain cursor-pointer hover:scale-110"
+            />
+
+            {/* <NextImage
+              src={"/ui/pause.png"}
+              alt="game name"
+              width={70}
+              height={100}
+              onClick={toggleCredits}
+              className="z-[1] relative"
+            /> */}
+
+            <NextImage
+              src={"/ui/exit.png"}
+              alt="game name"
+              onClick={quitGame}
+              width={82}
+              height={30}
+              className="z-[1] relative object-contain cursor-pointer hover:scale-110"
+            />
+          </div>
 
           {/* Instructions Overlay */}
           {showInstructions && (
@@ -532,6 +581,50 @@ export default function RetroPixelQuest() {
             </div>
           )}
 
+          {/* Pause Screen */}
+          {isPaused &&
+            !gameState.gameComplete &&
+            !showInstructions &&
+            !showCredits && (
+              <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 z-10">
+                <div className="bg-black border-4 border-orange-700 max-w-md flex items-center flex-col">
+                  <NextImage
+                    src={"/dungeon_quest.png"}
+                    alt="game name"
+                    width={400}
+                    height={300}
+                  />
+                  <div className="p-10 mt-7 bg-orange-950/30">
+                    <h2 className="text-orange-500 font-bold text-xl mb-3 text-center">
+                      GAME PAUSED
+                    </h2>
+                    <ul className="text-white space-y-2 text-sm">
+                      <li>• Press play to continue your quest</li>
+                      <li>• Or exit to return to the main menu</li>
+                    </ul>
+                  </div>
+                  <div className="flex gap-4 my-4">
+                    <NextImage
+                      src={"/ui/play.png"}
+                      onClick={togglePause}
+                      alt="game name"
+                      width={100}
+                      height={100}
+                      className="z-[1] relative hover:scale-110 cursor-pointer"
+                    />
+                    <NextImage
+                      src={"/ui/exit.png"}
+                      onClick={quitGame}
+                      alt="game name"
+                      width={100}
+                      height={100}
+                      className="z-[1] relative hover:scale-110 cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
           {/* Victory Screen */}
           {gameState.gameComplete && (
             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4">
@@ -563,9 +656,58 @@ export default function RetroPixelQuest() {
               </div>
             </div>
           )}
+
+          {/* Credits Dialog */}
+          {showCredits && (
+            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 z-20">
+              <div className="bg-black border-4 border-orange-700 max-w-md flex items-center flex-col">
+                <NextImage
+                  src={"/dungeon_quest.png"}
+                  alt="game name"
+                  width={400}
+                  height={300}
+                />
+                <div className="p-10 mt-7 bg-orange-950/30">
+                  <h2 className="text-orange-500 font-bold text-xl mb-3 text-center">
+                    CREDITS
+                  </h2>
+                  <div className="text-white space-y-4 text-sm">
+                    <div>
+                      <h3 className="text-orange-400 font-bold">
+                        Game Development
+                      </h3>
+                      <p>Created by Pixel Quest Team</p>
+                    </div>
+                    <div>
+                      <h3 className="text-orange-400 font-bold">Artwork</h3>
+                      <p>Pixel Art by Digital Dreamers</p>
+                    </div>
+                    <div>
+                      <h3 className="text-orange-400 font-bold">
+                        Music & Sound
+                      </h3>
+                      <p>Audio by Retro Sounds Studio</p>
+                    </div>
+                    <div>
+                      <h3 className="text-orange-400 font-bold">
+                        Special Thanks
+                      </h3>
+                      <p>To all the pixel art enthusiasts and retro gamers!</p>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={toggleCredits}
+                  className="mb-4 bg-orange-700 hover:bg-orange-600 text-white p-2 px-4 rounded flex items-center gap-2"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="bg-[#0f0a1e] border-4 border-orange-950 p-4 h-fit w-[230px] relative z-[1]">
+        <div className="bg-[#0f0a1e] border-4 border-orange-950 p-4 h-fit w-[260px] relative z-[1]">
           <NextImage
             src={"/ui/inventory.png"}
             alt="game name"
@@ -573,30 +715,34 @@ export default function RetroPixelQuest() {
             className="mb-5"
             height={200}
           />
-          <div className="grid grid-cols-1 gap-3 w-fit max-h-[50vh] overflow-y-auto">
+          <div className="grid grid-cols-1 gap-3 w-full max-h-[50vh] overflow-y-auto overflow-x-hidden">
             {gameState.items.map((item) => (
               <div
                 key={item.id}
-                className={`flex items-center w-full ${
+                className={`flex items-center justify-between gap-3 w-full ${
                   item.collected ? "text-[#5df15d]" : "text-[#6e6a85]"
                 }`}
               >
-                <div className="flex items-center gap-2 w-fit">
-                  <div
-                    className={`w-6 h-6 flex items-center justify-center border border-current ${
-                      item.collected ? "bg-[#392f5a]" : "bg-[#1a142e]"
-                    }`}
-                  >
-                    {item.collected && <span>✓</span>}
-                  </div>
-                  <div className="w-8 h-8 relative">
+                <NextImage
+                  src={item.collected ? "/ui/check.png" : "/ui/cross.png"}
+                  className="object-contain z-[1] relative"
+                  alt="game name"
+                  width={30}
+                  height={30}
+                />
+
+                <div className="flex items-center justify-end gap-2 w-full pr-3">
+                  <span className="capitalize text-sm  text-right">
+                    {item.id.replace("_", " ")}
+                  </span>
+
+                  <div className="w-8 h-8 relative ">
                     <img
                       src={`/inventory/${item.id}.png`}
                       alt={item.id}
                       className="w-full h-full object-contain pixelated opacity-60"
                     />
                   </div>
-                  <span className="capitalize text-sm ">{item.id}</span>
                 </div>
               </div>
             ))}
