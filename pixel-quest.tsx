@@ -4,22 +4,24 @@ import { Volume2, VolumeX } from "lucide-react";
 import NextImage from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useResponsiveCanvas } from "./hooks/use-responsive-canvas";
+// Game constants
+const BASE_WIDTH = 1200;
+const BASE_HEIGHT = 1200;
 
 const generateRandomPosition = () => {
+  // Use the correct BASE_WIDTH and BASE_HEIGHT values
+  // Add buffer from edges and account for item size (50x50)
+  const buffer = 100; // Buffer from edges
   return {
-    x: Math.floor(Math.random() * (1500 - 40)), // canvas width - item width
-    y: Math.floor(Math.random() * (1000 - 40)), // canvas height - item height
+    x: Math.floor(Math.random() * (BASE_WIDTH - 50 - buffer)) + buffer / 2,
+    y: Math.floor(Math.random() * (BASE_HEIGHT - 50 - buffer)) + buffer / 2,
   };
 };
 
 const firstItemPos = generateRandomPosition();
 
-// Game constants
-const BASE_WIDTH = 1200;
-const BASE_HEIGHT = 1200;
-
 const defaultGameState = {
-  player: { x: 100, y: 100, width: 80, height: 80, speed: 3 },
+  player: { x: 100, y: 100, width: 80, height: 80, speed: 10 },
   currentItemIndex: 0,
   items: [
     "boots",
@@ -300,14 +302,7 @@ export default function RetroPixelQuest() {
           ) {
             currentItem.collected = true;
             itemCollected = true;
-
-            // Set position for next item if available
-            const nextItem = updatedItems[prev.currentItemIndex + 1];
-            if (nextItem) {
-              const newPos = generateRandomPosition();
-              nextItem.x = newPos.x;
-              nextItem.y = newPos.y;
-            }
+            // We'll handle positioning in the random selection block below instead
           }
         }
 
@@ -315,9 +310,22 @@ export default function RetroPixelQuest() {
           pickupAudioRef.current.currentTime = 0;
           pickupAudioRef.current.play();
 
-          // Move to next item
-          if (prev.currentItemIndex < updatedItems.length - 1) {
-            prev.currentItemIndex++;
+          // Find uncollected items
+          const uncollectedItems = updatedItems
+            .map((item, index) => ({ item, index }))
+            .filter(({ item }) => !item.collected);
+
+          // Randomly select next item if there are any uncollected
+          if (uncollectedItems.length > 0) {
+            const randomIndex = Math.floor(
+              Math.random() * uncollectedItems.length
+            );
+            prev.currentItemIndex = uncollectedItems[randomIndex].index;
+
+            // Set a new random position for the newly selected item
+            const newPos = generateRandomPosition();
+            updatedItems[prev.currentItemIndex].x = newPos.x;
+            updatedItems[prev.currentItemIndex].y = newPos.y;
           }
         }
 
@@ -465,10 +473,11 @@ export default function RetroPixelQuest() {
         <NextImage src={"/map_dungeon.png"} alt="rock" fill={true} />
       </div>
       <NextImage
-        src={"/dungeon_quest_2.png"}
+        src={"/dungeon_quest.png"}
         alt="game name"
         width={300}
         height={300}
+        className="z-[1] relative"
       />
       <div className="flex flex-col md:flex-row gap-4 w-full p-4">
         <div
