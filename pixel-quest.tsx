@@ -22,47 +22,38 @@ const defaultGameState = {
   player: { x: 100, y: 100, width: 80, height: 80, speed: 3 },
   currentItemIndex: 0,
   items: [
-    {
-      id: "helmet",
-      x: firstItemPos.x,
-      y: firstItemPos.y,
+    "boots",
+    "shield",
+    "chestplate",
+    "helmet",
+    "sword",
+    "bread",
+    "dagger",
+    "elixir",
+    "flame",
+    "green_potion",
+    "key_rusty",
+    "meat",
+    "orb of light",
+    "pickaxe",
+    "red_potion",
+    "ring of fire",
+    "rope",
+    "spellbook",
+    "treasure_map",
+    "water",
+    "yellow_potion",
+  ].map((id, index) => {
+    const { x, y } = generateRandomPosition();
+    return {
+      id,
+      x,
+      y,
       width: 50,
       height: 50,
       collected: false,
-    },
-    {
-      id: "chestplate",
-      x: 0,
-      y: 0,
-      width: 50,
-      height: 50,
-      collected: false,
-    },
-    {
-      id: "boots",
-      x: 0,
-      y: 0,
-      width: 50,
-      height: 50,
-      collected: false,
-    },
-    {
-      id: "shield",
-      x: 0,
-      y: 0,
-      width: 50,
-      height: 50,
-      collected: false,
-    },
-    {
-      id: "sword",
-      x: 0,
-      y: 0,
-      width: 50,
-      height: 50,
-      collected: false,
-    },
-  ],
+    };
+  }),
   keys: {
     up: false,
     down: false,
@@ -100,7 +91,7 @@ export default function RetroPixelQuest() {
     const itemImages: Record<string, HTMLImageElement> = {};
     gameState.items.forEach((item) => {
       itemImages[item.id] = new Image();
-      itemImages[item.id].src = `/player/${item.id}.png`;
+      itemImages[item.id].src = `/inventory/${item.id}.png`;
     });
 
     const mapImg = new Image();
@@ -573,7 +564,7 @@ export default function RetroPixelQuest() {
             className="mb-5"
             height={200}
           />
-          <div className="grid grid-cols-1 gap-3 w-fit">
+          <div className="grid grid-cols-1 gap-3 w-fit max-h-[50vh] overflow-y-auto">
             {gameState.items.map((item) => (
               <div
                 key={item.id}
@@ -591,7 +582,7 @@ export default function RetroPixelQuest() {
                   </div>
                   <div className="w-8 h-8 relative">
                     <img
-                      src={`/player/${item.id}.png`}
+                      src={`/inventory/${item.id}.png`}
                       alt={item.id}
                       className="w-full h-full object-contain pixelated opacity-60"
                     />
