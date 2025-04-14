@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import NextImage from "next/image";
+import { useEffect, useRef, useState } from "react";
+
+const generateRandomPosition = () => {
+  return {
+    x: Math.floor(Math.random() * (640 - 40)), // canvas width - item width
+    y: Math.floor(Math.random() * (480 - 40)), // canvas height - item height
+  };
+};
+
+const firstItemPos = generateRandomPosition();
 
 const defaultGameState = {
-  player: { x: 100, y: 100, width: 80, height: 80, speed: 2 },
+  player: { x: 100, y: 100, width: 80, height: 80, speed: 3 },
   currentItemIndex: 0,
   items: [
     {
       id: "helmet",
-      x: 0,
-      y: 0,
+      x: firstItemPos.x,
+      y: firstItemPos.y,
       width: 40,
       height: 40,
       collected: false,
@@ -373,8 +377,7 @@ export default function RetroPixelQuest() {
   const resetGame = () => {
     const firstPos = generateRandomPosition();
     setGameState({
-      player: { x: 100, y: 100, width: 32, height: 32, speed: 3 },
-      currentItemIndex: 0,
+      ...defaultGameState,
       items: [
         {
           id: "helmet",
@@ -431,63 +434,23 @@ export default function RetroPixelQuest() {
     });
   };
 
-  const generateRandomPosition = () => {
-    return {
-      x: Math.floor(Math.random() * (640 - 40)), // canvas width - item width
-      y: Math.floor(Math.random() * (480 - 40)), // canvas height - item height
-    };
-  };
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
-      <div className="relative w-full max-w-[640px]">
-        {/* Game Title */}
-        <h1 className="text-center text-2xl md:text-4xl font-bold mb-4 text-[#f8d71c]  tracking-wider">
-          Retro Pixel Quest
-        </h1>
-
-        {/* Game Canvas */}
-        <div className="relative border-4 border-[#392f5a] rounded-sm overflow-hidden">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black select-none">
+      <NextImage
+        src={"/dungeon_quest_2.png"}
+        alt="game name"
+        width={300}
+        height={300}
+      />
+      <div className="flex flex-col md:flex-row gap-4 w-full p-4">
+        <div className="relative border-4 border-orange-950 rounded-sm overflow-hidden">
           <canvas
             ref={canvasRef}
-            width={1000}
+            width={1500}
             height={1000}
             className="pixelated"
             onClick={() => setShowInstructions(false)}
           />
-
-          {/* HUD Inventory */}
-          <div className="absolute top-2 right-2 bg-[#0f0a1e] border-2 border-[#f8d71c] p-2 rounded-sm">
-            <h3 className="text-[#f8d71c] text-xs mb-1">INVENTORY</h3>
-            <div className="grid grid-cols-1 gap-2">
-              {gameState.items.map((item) => (
-                <div
-                  key={item.id}
-                  className={`flex items-center ${
-                    item.collected ? "text-[#5df15d]" : "text-[#6e6a85]"
-                  } text-xs`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`w-5 h-5 flex items-center justify-center border border-current ${
-                        item.collected ? "bg-[#392f5a]" : "bg-[#1a142e]"
-                      }`}
-                    >
-                      {item.collected && <span>✓</span>}
-                    </div>
-                    <div className="w-6 h-6 relative">
-                      <img
-                        src={`/${item.id}.png`}
-                        alt={item.id}
-                        className="w-full h-full object-contain pixelated opacity-60"
-                      />
-                    </div>
-                    <span className="capitalize">{item.id}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* Sound Toggle */}
           <button
@@ -503,41 +466,103 @@ export default function RetroPixelQuest() {
               className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4 cursor-pointer"
               onClick={() => setShowInstructions(false)}
             >
-              <div className="bg-[#0f0a1e] border-2 border-[#f8d71c] p-4 rounded-sm max-w-md">
-                <h2 className="text-[#f8d71c] text-xl mb-3  text-center">
-                  HOW TO PLAY
-                </h2>
-                <ul className="text-white space-y-2  text-sm">
-                  <li>• Move with WASD or Arrow Keys</li>
-                  <li>• Collect all 5 armor pieces</li>
-                  <li>• Complete your inventory</li>
-                </ul>
-                <p className="text-[#5df15d] mt-4 text-center  text-sm">
-                  Click anywhere to start!
-                </p>
+              <div className="bg-black border-4 border-orange-700 rounded-sm max-w-md flex items-center flex-col">
+                <NextImage
+                  src={"/dungeon_quest.png"}
+                  alt="game name"
+                  width={400}
+                  height={300}
+                />
+                <div className="p-10 mt-7 bg-orange-950/30">
+                  <h2 className="text-orange-500 font-bold text-xl mb-3  text-center">
+                    HOW TO PLAY
+                  </h2>
+                  <ul className="text-white space-y-2  text-sm">
+                    <li>• Move with WASD or Arrow Keys</li>
+                    <li>• Collect all 5 armor pieces</li>
+                    <li>• Complete your inventory</li>
+                  </ul>
+                </div>
+                <NextImage
+                  src={"/ui/start.png"}
+                  alt="game name"
+                  width={100}
+                  className="hover:scale-110"
+                  height={100}
+                />
               </div>
             </div>
           )}
 
           {/* Victory Screen */}
           {gameState.gameComplete && (
-            <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center">
-              <div className="bg-[#0f0a1e] border-2 border-[#f8d71c] p-4 rounded-sm max-w-md text-center">
-                <h2 className="text-[#f8d71c] text-2xl mb-3 ">
-                  ⚡ QUEST COMPLETE! ⚡
-                </h2>
-                <p className="text-white mb-4 ">
-                  You've collected all armor pieces!
-                </p>
-                <button
+            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-4">
+              <div className="bg-black border-4 border-orange-700 rounded-sm max-w-md flex items-center flex-col">
+                <NextImage
+                  src={"/dungeon_quest.png"}
+                  alt="game name"
+                  width={400}
+                  height={300}
+                />
+                <div className="p-10 mt-7 bg-orange-950/30">
+                  <h2 className="text-orange-500 font-bold text-xl mb-3 text-center">
+                    ⚡ QUEST COMPLETE! ⚡
+                  </h2>
+                  <ul className="text-white space-y-2 text-sm">
+                    <li>• You've collected all armor pieces!</li>
+                    <li>• Your inventory is complete</li>
+                    <li>• Ready for new adventures?</li>
+                  </ul>
+                </div>
+                <NextImage
+                  src={"/ui/play.png"}
+                  alt="game name"
+                  width={100}
+                  className="hover:scale-110 cursor-pointer"
+                  height={100}
                   onClick={resetGame}
-                  className="bg-[#392f5a] text-[#f8d71c] px-4 py-2 rounded-sm  hover:bg-[#4e3f7a] transition-colors"
-                >
-                  PLAY AGAIN
-                </button>
+                />
               </div>
             </div>
           )}
+        </div>
+
+        <div className="bg-[#0f0a1e] border-4 border-orange-800 p-4 rounded-sm h-fit w-[230px]">
+          <NextImage
+            src={"/ui/inventory.png"}
+            alt="game name"
+            width={300}
+            className="mb-5"
+            height={200}
+          />
+          <div className="grid grid-cols-1 gap-3 w-fit">
+            {gameState.items.map((item) => (
+              <div
+                key={item.id}
+                className={`flex items-center w-full ${
+                  item.collected ? "text-[#5df15d]" : "text-[#6e6a85]"
+                }`}
+              >
+                <div className="flex items-center gap-2 w-fit">
+                  <div
+                    className={`w-6 h-6 flex items-center justify-center border border-current ${
+                      item.collected ? "bg-[#392f5a]" : "bg-[#1a142e]"
+                    }`}
+                  >
+                    {item.collected && <span>✓</span>}
+                  </div>
+                  <div className="w-8 h-8 relative">
+                    <img
+                      src={`/${item.id}.png`}
+                      alt={item.id}
+                      className="w-full h-full object-contain pixelated opacity-60"
+                    />
+                  </div>
+                  <span className="capitalize text-sm ">{item.id}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
