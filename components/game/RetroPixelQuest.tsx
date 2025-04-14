@@ -121,15 +121,14 @@ export default function RetroPixelQuest() {
             scale={scale}
             onCanvasClick={() => setShowInstructions(false)}
           />
-
           <GameControls
             soundEnabled={soundEnabled}
             isPaused={isPaused}
             onToggleSound={toggleSound}
             onTogglePause={togglePause}
             onQuitGame={quitGame}
+            onShowCredits={toggleCredits}
           />
-
           {showInstructions && (
             <InstructionsScreen onClose={() => setShowInstructions(false)} />
           )}
@@ -141,20 +140,10 @@ export default function RetroPixelQuest() {
           )}
           {showCredits && <CreditsScreen onClose={toggleCredits} />}
         </div>
-
         {/* Add Inventory sidebar */}
         <div className="w-full md:w-[240px] h-[60vh] md:h-[65vh]">
           <Inventory items={gameState.items} />
         </div>
-      </div>
-
-      <div className="mt-6">
-        <button
-          onClick={toggleCredits}
-          className="bg-orange-700/50 text-white px-4 py-2 rounded hover:bg-orange-700"
-        >
-          Credits
-        </button>
       </div>
 
       <audio ref={audioRef} src="/bgm.mp3" loop />

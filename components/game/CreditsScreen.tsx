@@ -21,16 +21,38 @@ const CreditsScreen: React.FC<CreditsScreenProps> = ({ onClose }) => {
           </h2>
           <div className="text-white space-y-4 text-sm">
             <div>
-              <h3 className="text-orange-400 font-bold">Game Development</h3>
-              <p>Created by Pixel Quest Team</p>
+              <h3 className="text-orange-400 font-bold">Game Built By</h3>
+              <p>Aryan Randeriya for Frontend UI Hackathon by Outlier AI</p>
             </div>
             <div>
-              <h3 className="text-orange-400 font-bold">Artwork</h3>
-              <p>Pixel Art by Digital Dreamers</p>
-            </div>
-            <div>
-              <h3 className="text-orange-400 font-bold">Music & Sound</h3>
-              <p>Audio by Retro Sounds Studio</p>
+              <h3 className="text-orange-400 font-bold">Connect</h3>
+              <p>
+                LinkedIn:{" "}
+                <a
+                  href="https://linkedin.com/in/aryanranderiya"
+                  className="text-orange-300 underline"
+                >
+                  aryanranderiya
+                </a>
+              </p>
+              <p>
+                GitHub:{" "}
+                <a
+                  href="https://github.com/aryanranderiya"
+                  className="text-orange-300 underline"
+                >
+                  aryanranderiya
+                </a>
+              </p>
+              <p>
+                Website:{" "}
+                <a
+                  href="https://aryanranderiya.com"
+                  className="text-orange-300 underline"
+                >
+                  aryanranderiya.com
+                </a>
+              </p>
             </div>
             <div>
               <h3 className="text-orange-400 font-bold">Special Thanks</h3>
