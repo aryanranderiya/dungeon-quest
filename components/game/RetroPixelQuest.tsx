@@ -104,15 +104,15 @@ export default function RetroPixelQuest() {
       <Image
         src={"/dungeon_quest_2.png"}
         alt="game name"
-        width={300}
-        height={300}
+        width={200}
+        height={200}
         className="z-[1] relative"
       />
 
       <div className="flex flex-col md:flex-row gap-4 p-4 w-full">
         <div
           ref={containerRef}
-          className="relative overflow-hidden flex-1 w-full h-[60vh] md:h-[65vh]"
+          className="relative overflow-hidden flex-1 w-full h-[80vh] md:h-[80vh]"
         >
           <GameCanvas
             gameState={gameState}
