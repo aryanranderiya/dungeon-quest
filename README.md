@@ -1,8 +1,9 @@
+<img src="https://github.com/aryanranderiya/dungeon-quest/blob/main/public/dungeon_quest.png" width=200/>
+
 # Dungeon Quest 🎮
 
 A retro-styled adventure game built with Next.js, React, and TypeScript. Explore a pixel art dungeon, collect items, and complete your inventory!
 
-![Dungeon Quest Game](/dungeon_quest.png)
 
 ## 🎯 Game Overview
 
@@ -14,6 +15,14 @@ A retro-styled adventure game built with Next.js, React, and TypeScript. Explore
 - **Item Collection**: Find and collect 21 unique items scattered around the dungeon
 - **Inventory System**: Track your collected items in a dedicated sidebar
 - **CRT Effect**: Nostalgic CRT screen overlay for that authentic retro gaming experience
+
+## Screenshots
+
+![Screenshot from 2025-04-30 03-12-37](https://github.com/user-attachments/assets/413c974c-6a23-4d68-8d10-b7a8f5f3c261)
+![Screenshot from 2025-04-30 03-12-42](https://github.com/user-attachments/assets/41010548-03bc-4c87-b463-bbc6a54e8155)
+![Screenshot from 2025-04-30 03-12-47](https://github.com/user-attachments/assets/3352e33e-3b22-4f42-adc0-f6f5dc4054ee)
+
+
 
 ## 🎮 How to Play
 
